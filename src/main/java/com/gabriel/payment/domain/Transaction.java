@@ -18,8 +18,7 @@ public class Transaction {
 
     @Enumerated(EnumType.STRING)    //if changes it doesnt broke
     @Column(nullable = false)
-    private TransactionStatus status;  //CREATED, SUCESS, FAILED
-
+    private TransactionStatus status;
     @Column(nullable = false, unique = true)
     private String transactionId;
 
@@ -29,15 +28,42 @@ public class Transaction {
     public Transaction() {}
 
     public Transaction(BigDecimal amount, String transactionId){
-        if(amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
-            throw new IllegalArgumentException("Amount must be greater than zero");
-        }
+
         this.amount = amount;
         this.transactionId =  transactionId;
         this.status = TransactionStatus.CREATED;
         this.createdAt = LocalDateTime.now();
 
     }
+
+    //intetions methods
+    public void markAsApproved(){
+
+        //does not make sense cancelled to approve
+        if(this.status != TransactionStatus.CREATED &&
+        this.status != TransactionStatus.PENDING){
+            throw new IllegalStateException(("Cannot approve transaction in status:" + this.status));
+        }
+        this.status = TransactionStatus.APPROVED;
+    }
+
+    public void markAsFailed(){
+        if(this.status == TransactionStatus.APPROVED){
+            throw  new IllegalStateException("Cannot fail an already approved transaction");
+        }
+        this.status = TransactionStatus.FAILED;
+    }
+
+    public void markAsCancelled(){
+        if(this.status == TransactionStatus.APPROVED){
+            throw new IllegalStateException(("Cannot cancel a approved transaction"));
+        }
+
+        this.status = TransactionStatus.CANCELLED;
+    }
+
+
+
     public String getId() {
         return id;
     }
