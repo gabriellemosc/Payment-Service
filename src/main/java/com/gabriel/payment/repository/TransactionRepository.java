@@ -9,5 +9,4 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
     Optional<Transaction> findByTransactionId(String transactionId);
 
-    Transaction save();
 }

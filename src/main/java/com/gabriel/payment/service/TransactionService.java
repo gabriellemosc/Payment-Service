@@ -3,10 +3,13 @@ package com.gabriel.payment.service;
 import com.gabriel.payment.domain.TransactionStatus;
 import com.gabriel.payment.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.gabriel.payment.domain.Transaction;
 import java.math.BigDecimal;
 import java.util.Optional;
+import com.gabriel.payment.dto.CreateTransactionRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class TransactionService {
@@ -22,11 +25,13 @@ public class TransactionService {
     public Transaction createTransaction(BigDecimal amount, String transactionId){  // the values come from the Controller
 
         if(transactionId == null || transactionId.trim().isEmpty()){
-            throw new IllegalArgumentException(("TransactionID cannot be empty"));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                              "Amount must be bigger than 0"          );
         }
 
         if(amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
-            throw new IllegalArgumentException("Amount must be bigger than 0");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                    "Amount must be bigger than 0.");
         }
 
         Optional<Transaction> existingTransaction =     //optional something that cannot exists, without null
@@ -51,10 +56,15 @@ public class TransactionService {
     }
 
 
+    @Transactional
     public Transaction updateStatus(String id, TransactionStatus newStatus){
 
+
         Transaction transaction = transactionRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException(("Transaction Not Found")));
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "Transaction Not Found")
+                )
+                ;
 
         switch (newStatus){
             case APPROVED -> transaction.markAsApproved();

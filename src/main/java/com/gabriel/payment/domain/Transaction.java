@@ -1,4 +1,5 @@
 package com.gabriel.payment.domain;
+import com.gabriel.payment.exception.BusinessException;
 import jakarta.persistence.*;   //JPA annoations
 import java.math.BigDecimal;    //money
 import java.time.LocalDateTime;
@@ -36,31 +37,39 @@ public class Transaction {
 
     }
 
+    //final status that cannot be change
+    private boolean isFinalStatus(){
+        return  this.status == TransactionStatus.APPROVED
+                || this.status == TransactionStatus.CANCELLED
+                || this.status == TransactionStatus.FAILED;
+    }
+
     //intetions methods
     public void markAsApproved(){
 
         //does not make sense cancelled to approve
-        if(this.status != TransactionStatus.CREATED &&
-        this.status != TransactionStatus.PENDING){
-            throw new IllegalStateException(("Cannot approve transaction in status:" + this.status));
+        if(isFinalStatus()){
+            throw new BusinessException("Cannot change status from final stage:" + this.status);
         }
         this.status = TransactionStatus.APPROVED;
     }
 
     public void markAsFailed(){
-        if(this.status == TransactionStatus.APPROVED){
-            throw  new IllegalStateException("Cannot fail an already approved transaction");
+        if(isFinalStatus()){
+            throw  new BusinessException("Cannot change status from final stage" + this.status);
         }
         this.status = TransactionStatus.FAILED;
     }
 
     public void markAsCancelled(){
-        if(this.status == TransactionStatus.APPROVED){
-            throw new IllegalStateException(("Cannot cancel a approved transaction"));
+        if(isFinalStatus()){
+            throw new BusinessException("Cannot change status from final stage" + this.status);
         }
 
         this.status = TransactionStatus.CANCELLED;
     }
+
+
 
 
 
