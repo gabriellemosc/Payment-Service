@@ -1,6 +1,7 @@
 package com.gabriel.payment.service;
 
 import com.gabriel.payment.domain.TransactionStatus;
+import com.gabriel.payment.exception.BusinessException;
 import com.gabriel.payment.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
@@ -8,8 +9,8 @@ import org.springframework.stereotype.Service;
 import com.gabriel.payment.domain.Transaction;
 import java.math.BigDecimal;
 import java.util.Optional;
-import com.gabriel.payment.dto.CreateTransactionRequest;
 import org.springframework.web.server.ResponseStatusException;
+import com.gabriel.payment.exception.ResourceNotFoundException;
 
 @Service
 public class TransactionService {
@@ -52,7 +53,9 @@ public class TransactionService {
 
     public Transaction findTransactionbyId(String id){
 
-        return transactionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Transaction not found!"));
+        return transactionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(
+                                                                            "Transaction Not Found"
+        ));
     }
 
 
@@ -61,17 +64,10 @@ public class TransactionService {
 
 
         Transaction transaction = transactionRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                                "Transaction Not Found")
-                )
+                new ResourceNotFoundException("Transaction Not Found"));
                 ;
 
-        switch (newStatus){
-            case APPROVED -> transaction.markAsApproved();
-            case FAILED -> transaction.markAsFailed();
-            case CANCELLED -> transaction.markAsCancelled();
-            default -> throw new IllegalArgumentException("Status not supported");
-        }
+        transaction.changeStatus(newStatus);
 
         return transaction;
 

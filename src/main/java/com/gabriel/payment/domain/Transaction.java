@@ -37,39 +37,24 @@ public class Transaction {
 
     }
 
-    //final status that cannot be change
-    private boolean isFinalStatus(){
-        return  this.status == TransactionStatus.APPROVED
-                || this.status == TransactionStatus.CANCELLED
-                || this.status == TransactionStatus.FAILED;
-    }
+    public void changeStatus(TransactionStatus newStatus){
 
-    //intetions methods
-    public void markAsApproved(){
-
-        //does not make sense cancelled to approve
-        if(isFinalStatus()){
-            throw new BusinessException("Cannot change status from final stage:" + this.status);
-        }
-        this.status = TransactionStatus.APPROVED;
-    }
-
-    public void markAsFailed(){
-        if(isFinalStatus()){
-            throw  new BusinessException("Cannot change status from final stage" + this.status);
-        }
-        this.status = TransactionStatus.FAILED;
-    }
-
-    public void markAsCancelled(){
-        if(isFinalStatus()){
-            throw new BusinessException("Cannot change status from final stage" + this.status);
+        if(newStatus == null){
+            throw new BusinessException("New Status Cannot be Null");
         }
 
-        this.status = TransactionStatus.CANCELLED;
+        if(this.status == newStatus){       //ideponten
+            return;
+        }
+
+        if(!this.status.canTransitionTo(newStatus)){
+            throw new BusinessException(
+                    "Invalid Transition from " + this.status + " to " + newStatus
+            );
+        }
+
+        this.status = newStatus;
     }
-
-
 
 
 
