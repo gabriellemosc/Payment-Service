@@ -75,12 +75,13 @@ public class TransactionService {
 
 
     @Transactional
-    public Transaction updateStatus(String id, TransactionStatus newStatus){
+    public Transaction updateStatus(String transactionId, TransactionStatus newStatus){
 
-
-        Transaction transaction = transactionRepository.findById(id).orElseThrow(() ->
+        Transaction transaction = transactionRepository.findByTransactionId(transactionId).orElseThrow(() ->
                 new ResourceNotFoundException("Transaction Not Found"));
                 ;
+
+
 
         transaction.changeStatus(newStatus);
 
