@@ -15,10 +15,11 @@ public class TransactionResponse {
     private TransactionStatus status;
     private LocalDateTime createdAt;
 
+
     public TransactionResponse(Transaction transaction){
         this.id = transaction.getId();                      //intern iD
         this.amount = transaction.getAmount();
-        this.transactionId = transaction.getTransactionId();//extern ID
+        this.transactionId = transaction.getTransactionId(); //extern ID
         this.status = transaction.getStatus();
         this.createdAt = transaction.getCreatedAt();
 

@@ -11,14 +11,19 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import org.springframework.web.server.ResponseStatusException;
 import com.gabriel.payment.exception.ResourceNotFoundException;
+import com.gabriel.payment.gateway.dto.PaymentGatewayResponse;
+import com.gabriel.payment.gateway.PaymentGateway;
+
 
 @Service
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;  //acess the DB. Interface JPA
+    private final PaymentGateway paymentGateway;
 
-    public TransactionService(TransactionRepository transactionRepository){
+    public TransactionService(TransactionRepository transactionRepository, PaymentGateway paymentGateway){
         this.transactionRepository = transactionRepository;
+        this.paymentGateway = paymentGateway;
     }
 
 
@@ -46,6 +51,16 @@ public class TransactionService {
 
         //create a new instance of Transaction
         Transaction transaction = new Transaction(amount, transactionId);
+
+        //intern status
+        transaction.changeStatus(TransactionStatus.PENDING);
+
+        PaymentGatewayResponse gatewayResponse = paymentGateway.createPayment(transaction);
+
+        transaction.setExternalId(gatewayResponse.externalId());    //save extern id generate by provider
+
+        transaction.changeStatus(TransactionStatus.valueOf(gatewayResponse.status()));
+
 
         return  transactionRepository.save(transaction);    //save the entity on bank
     }

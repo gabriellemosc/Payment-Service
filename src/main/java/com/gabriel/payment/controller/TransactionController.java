@@ -1,7 +1,6 @@
 package com.gabriel.payment.controller;
 
 import com.gabriel.payment.domain.Transaction;
-import com.gabriel.payment.domain.TransactionStatus;
 import com.gabriel.payment.dto.CreateTransactionRequest;
 import com.gabriel.payment.dto.TransactionResponse;
 import com.gabriel.payment.dto.UpdateStatusRequest;

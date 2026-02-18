@@ -23,6 +23,9 @@ public class Transaction {
     @Column(nullable = false, unique = true)
     private String transactionId;
 
+    @Column(unique = true)
+    private String externalId; //return by gateway
+
     @Column(nullable = false)   //obrigation date
     private LocalDateTime createdAt;
 
@@ -56,8 +59,6 @@ public class Transaction {
         this.status = newStatus;
     }
 
-
-
     public String getId() {
         return id;
     }
@@ -65,6 +66,7 @@ public class Transaction {
     public BigDecimal getAmount() {
         return amount; //
     }
+
 
 
     public TransactionStatus getStatus() {
@@ -77,6 +79,10 @@ public class Transaction {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
 
