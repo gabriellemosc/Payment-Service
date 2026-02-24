@@ -1,8 +1,8 @@
 package com.gabriel.payment.controller;
 
 
-import com.gabriel.payment.dto.UpdateStatusRequest;
-import com.gabriel.payment.service.TransactionService;
+import com.gabriel.payment.dto.WebhookRequest;
+import com.gabriel.payment.service.WebhookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,18 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/webhook")
 public class WebhookController {
 
-    private final TransactionService transactionService;
+    private final WebhookService webhookService;
 
-    public WebhookController(TransactionService transactionService){
-        this.transactionService = transactionService;
+    public WebhookController(WebhookService webhookService){
+        this.webhookService = webhookService;
     }
 
     @PostMapping
-    public ResponseEntity<Void> updateTransactionStatus(@RequestBody UpdateStatusRequest request){
+    public ResponseEntity<Void> receiveWebhook(@RequestBody WebhookRequest request){
 
-        transactionService.updateStatus(
-                request.getTransactionId(),
-                request.getStatus()                 //get new status
+        webhookService.process(
+             request               //get new status
         );
 
         return ResponseEntity.ok().build(); //return 200

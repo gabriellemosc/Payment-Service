@@ -82,7 +82,6 @@ public class TransactionService {
                 ;
 
 
-
         transaction.changeStatus(newStatus);
 
         return transaction;
